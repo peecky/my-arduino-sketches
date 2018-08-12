@@ -8,5 +8,4 @@ inline int toggleDigitalValue(int& value) {
   return value = value == LOW ? HIGH : LOW;
 }
 
-
 #endif

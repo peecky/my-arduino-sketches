@@ -1,6 +1,6 @@
 #include <DHT.h>
 #include <IRremote.h>
-#include "common.h"
+#include "common.h" // link (or simply copy) ../common.h
 
 enum AirConIROperation { noop, turnOn, turnOff };
 
