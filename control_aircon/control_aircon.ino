@@ -34,11 +34,11 @@ inline float getSleepModeProgress() {
 
 inline void printStat() {
   SerialPrintValue("Temperature", temperature);
-  SerialPrintValue("MAX", maxTemperature);
-  SerialPrintValue("MIN", minTemperature);
+  SerialPrintValue("MAX (4/5)", maxTemperature);
+  SerialPrintValue("MIN (6/7)", minTemperature);
   SerialPrintValue("irSentAt", irSentAt);
-  SerialPrintValue("irSendingInactivated", irSendingInactivated);
-  SerialPrintValue("sleepModeBeginAt", sleepModeBeginAt);
+  SerialPrintValue("irSendingInactivated (0)", irSendingInactivated);
+  SerialPrintValue("sleepModeBeginAt (2)", sleepModeBeginAt);
   if (sleepModeBeginAt) SerialPrintValue("sleepModeProgress", getSleepModeProgress());
   SerialPrintValue("now", now);
   Serial.println("");
@@ -136,19 +136,19 @@ inline void handleSerialInput() {
       break;
 
       case '4':
-      maxTemperature += temperatureDiffUnit;
-      break;
-
-      case '5':
       maxTemperature -= temperatureDiffUnit;
       break;
 
+      case '5':
+      maxTemperature += temperatureDiffUnit;
+      break;
+
       case '6':
-      minTemperature += temperatureDiffUnit;
+      minTemperature -= temperatureDiffUnit;
       break;
 
       case '7':
-      minTemperature -= temperatureDiffUnit;
+      minTemperature += temperatureDiffUnit;
       break;
 
       case '8':
@@ -182,4 +182,3 @@ void loop() {
   controlAirCon();
   handleSerialInput();
 }
-
