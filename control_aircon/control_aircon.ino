@@ -20,8 +20,12 @@ const unsigned long sleepModeDuration = 21600000L; // 6 hour
 const unsigned long turnOnLGAirCon = 0x8800E0EL; // 0x8800E0E: 29C. 0x8800F0F: 30C. See http://blog.iolate.kr/235
 const unsigned long turnOffLGAirCon = 0x88C0051L;
 IRsend irsend;
-unsigned long irSentAt = 0L;
 bool irSendingInactivated = false;
+
+const unsigned long minimumSendingIRInterval = 60000L; // 1 min
+const unsigned long minimumSendingSameIRInterval = 300000L; // 5 min
+unsigned long irSentAt = 0L;
+AirConIROperation lastIROperation = noop;
 
 inline void sendLG(unsigned long code) {
   irsend.sendLG(code, 28);
@@ -56,10 +60,9 @@ inline void getTemperature() {
 }
 
 inline void controlAirCon() {
-  const unsigned long minimumSendingIRInterval = 300000L; // 5 min
-
   if (irSendingInactivated) return;
-  if (irSentAt != 0 && now - irSentAt < minimumSendingIRInterval) return;
+  const unsigned long irSendingInterval = now - irSentAt;
+  if (irSentAt != 0 && irSendingInterval < minimumSendingIRInterval) return;
 
   const float outboundTemperatureDiff = 10.0f;
   const float sleepModeTemperatureDiff = 2.0f;
@@ -89,9 +92,12 @@ inline void controlAirCon() {
   }
 
   if (irOperation != noop) {
+    if (irOperation == lastIROperation && irSendingInterval < minimumSendingSameIRInterval) return;
+
     edgeTemperatureHitCount += 1;
     if (edgeTemperatureHitCount >= maxEdgeTemperatureHitCount) {
       edgeTemperatureHitCount = 0;
+      lastIROperation = irOperation;
       if (irOperation == turnOn) {
         SerialPrintln("Turn On");
         sendLG(turnOnLGAirCon);
